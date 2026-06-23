@@ -46,8 +46,8 @@ def fetch_and_report(symbol: str, start: str, end: str) -> bool:
     """Fetch and display data for a single symbol. Returns success status."""
     try:
         symbol = validate_symbol(symbol)
-        validate_date(start)
-        validate_date(end)
+        start = validate_date(start).strftime("%Y-%m-%d")
+        end = validate_date(end).strftime("%Y-%m-%d")
         
         logger.info(f"Fetching fundamentals for {symbol}")
         fundamentals = fetch_company_fundamentals(symbol)
@@ -84,7 +84,7 @@ def main(argv: Sequence[str] | None = None) -> None:
         return
 
     symbol_input = choose_symbol(args.symbol)
-    symbols = [s.strip() for s in symbol_input.split(",")]
+    symbols = [s.strip() for s in symbol_input.split(",") if s.strip()]
     
     success_count = 0
     for symbol in symbols:

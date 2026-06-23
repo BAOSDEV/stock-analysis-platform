@@ -9,8 +9,7 @@ import pandas as pd
 
 def format_fundamentals_table(fundamentals: dict[str, Any]) -> str:
     """Format fundamentals as a clean text table."""
-    df = pd.DataFrame([fundamentals]).T
-    df.columns = ["Value"]
+    df = pd.Series(fundamentals).to_frame(name="Value")
     return df.to_string()
 
 
@@ -19,6 +18,7 @@ def format_prices_summary(prices: pd.DataFrame, symbol: str) -> str:
     if prices.empty:
         return "No price data available."
 
+    close_col = prices.get("Close")
     summary = {
         "Symbol": symbol,
         "Start Date": prices.index[0].strftime("%Y-%m-%d"),
@@ -26,14 +26,13 @@ def format_prices_summary(prices: pd.DataFrame, symbol: str) -> str:
         "Rows": len(prices),
     }
 
-    if "Close" in prices.columns:
+    if close_col is not None:
         summary.update({
-            "Close (Latest)": prices["Close"].iloc[-1],
-            "Close (Min)": prices["Close"].min(),
-            "Close (Max)": prices["Close"].max(),
-            "Close (Mean)": float(prices["Close"].mean()),
+            "Close (Latest)": close_col.iloc[-1],
+            "Close (Min)": close_col.min(),
+            "Close (Max)": close_col.max(),
+            "Close (Mean)": float(close_col.mean()),
         })
 
-    df = pd.DataFrame(summary, index=[0]).T
-    df.columns = [""]
-    return df.to_string()
+    series = pd.Series(summary, name="")
+    return series.to_string()

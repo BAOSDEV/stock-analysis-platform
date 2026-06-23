@@ -7,6 +7,13 @@ import pandas as pd
 import yfinance as yf
 
 logger = logging.getLogger(__name__)
+SUPPORTED_SOURCE = "yahoo"
+
+
+def _validate_source(source: str) -> None:
+    """Validate that the source is supported."""
+    if source.lower() != SUPPORTED_SOURCE:
+        raise ValueError(f"Only the '{SUPPORTED_SOURCE}' source is supported in Phase 1.")
 
 
 def fetch_price_history(symbol: str, start: str, end: str, source: str = "yahoo") -> pd.DataFrame:
@@ -25,8 +32,7 @@ def fetch_price_history(symbol: str, start: str, end: str, source: str = "yahoo"
         ValueError: If source is not 'yahoo'
         RuntimeError: If no data is available
     """
-    if source.lower() != "yahoo":
-        raise ValueError("Only the 'yahoo' source is supported in Phase 1.")
+    _validate_source(source)
 
     logger.debug(f"Downloading {symbol} from {start} to {end}")
     data = yf.download(symbol, start=start, end=end, progress=False)
@@ -51,8 +57,7 @@ def fetch_company_fundamentals(symbol: str, source: str = "yahoo") -> dict[str, 
         ValueError: If source is not 'yahoo'
         RuntimeError: If no fundamentals data is available
     """
-    if source.lower() != "yahoo":
-        raise ValueError("Only the 'yahoo' source is supported in Phase 1.")
+    _validate_source(source)
 
     logger.debug(f"Fetching fundamentals for {symbol}")
     ticker = yf.Ticker(symbol)
